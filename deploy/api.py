@@ -10,7 +10,7 @@ from PointerNetworkLinker import PointerNetworkLinker
 from pynif import NIFCollection
 from rdflib import URIRef
 
-logging.basicConfig(filename='/var/log/asknow/earl.log',level=logging.INFO)
+logging.basicConfig(filename='earl.log',level=logging.INFO)
 modelpath = sys.argv[1]
 v = Vectoriser()
 p = PointerNetworkLinker(modelpath)
