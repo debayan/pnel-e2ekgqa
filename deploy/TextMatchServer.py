@@ -24,7 +24,7 @@ def ConvertVectorSetToVecAverageBased(vectorSet, ignore = []):
 print("TextMatch initializing, loading fastext")
 try:
     es = Elasticsearch()
-    model = gensim.models.KeyedVectors.load_word2vec_format('../data/fasttext-wiki-news-subwords-300')
+    model = gensim.models.KeyedVectors.load_word2vec_format('./data/fasttext-wiki-news-subwords-300')
     print("loaded fastext")
 except Exception as e:
     print(e)

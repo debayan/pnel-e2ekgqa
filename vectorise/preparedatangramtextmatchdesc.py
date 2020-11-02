@@ -4,31 +4,35 @@ import json
 from elasticsearch import Elasticsearch
 from fuzzywuzzy import fuzz
 import requests
-from annoy import AnnoyIndex
+#from annoy import AnnoyIndex
 import re,random
 from nltk.util import ngrams
 from textblob import TextBlob
-import urllib2
+#import urllib2
 from multiprocessing import Pool
-import redis
+#import redis
 import random
 
-redisdb = redis.Redis()
+#redisdb = redis.Redis()
 
 def mean(a):
     return sum(a) / len(a)
 
 postags = ["CC","CD","DT","EX","FW","IN","JJ","JJR","JJS","LS","MD","NN","NNS","NNP","NNPS","PDT","POS","PRP","PRP$","RB","RBR","RBS","RP","SYM","TO","UH","VB","VBD","VBG","VBN","VBP","VBZ","WDT","WP","WP$","WRB"]
-es = Elasticsearch()
+es = Elasticsearch(port=9200)
 
 writef = open(sys.argv[3], 'w') 
 
 def getdescription(entid):
     res = es.search(index="wikidataentitydescriptionsindex01", body={"query":{"term":{"entityid.keyword":entid}}})
     try:
-        description = res['hits']['hits'][0]['_source']['description']
-        return description
+        if len(res['hits']['hits']) > 0:
+            description = res['hits']['hits'][0]['_source']['description']
+            return description
+        else:
+            return ''
     except Exception as e:
+        print('getdescr error: ',e)
         return ''
 cache = {}
 
@@ -36,15 +40,13 @@ def gettextembedding(text):
     if text in cache:
         return cache[text]
     try:
-        req = urllib2.Request('http://localhost:8887/ftwv')
-        req.add_header('Content-Type', 'application/json')
         inputjson = {'chunks':[text]}
-        response = urllib2.urlopen(req, json.dumps(inputjson))
-        labelembedding = json.loads(response.read().decode('utf8'))[0]
+        response = requests.post('http://localhost:8887/ftwv', json=inputjson)
+        labelembedding = response.json()[0]
         cache[text] = labelembedding
         return labelembedding
     except Exception as e:
-        #print("getdescriptionsembedding err: ",e)
+        print("getdescriptionsembedding err: ",e)
         return [0]*300
     return [0]*300
 
@@ -55,7 +57,7 @@ def getembedding(enturl):
         embedding = [float(x) for x in res['hits']['hits'][0]['_source']['embedding']]
         return embedding
     except Exception as e:
-        #print(enturl,' not found')
+        print(enturl,' not found')
         return None
     return None
 
@@ -155,7 +157,7 @@ def givewordvectors(inputtuple):#(id,question,entities):
                             candidatevectors.append([questionembedding+tokenembedding+entityembedding+descembedding+posonehot+textmatchmetric+[entidx,idx,3],esresult['_source']['uri'][37:],0.0])
     print("len ",len(candidatevectors[0][0])) 
     writef.write(json.dumps([id,item['entities'],candidatevectors])+'\n')
-    #return (id,entities,candidatevectors)
+    return (id,entities,candidatevectors)
 
 d = json.loads(open(sys.argv[1]).read())
 random.shuffle(d)
@@ -166,8 +168,9 @@ for idx,item in enumerate(d):
         continue
     print(idx,item['question'])
     inputcandidates.append((item['id'],item['question'],item['entities']))
-    candidatevectors = givewordvectors(item['id'],item['question'],item['entities'])
+    candidatevectors = givewordvectors((item['id'],item['question'],item['entities']))
     print(len(candidatevectors))
+    sys.exit(1)
 #pool = Pool(10)
 #responses = pool.imap(givewordvectors,inputcandidates)
 #count = 0
