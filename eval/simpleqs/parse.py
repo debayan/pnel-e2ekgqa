@@ -8,7 +8,7 @@ from multiprocessing import Pool
 def hiturl(questionserial):
     question = questionserial[0]
     serial = questionserial[1]
-    req = urllib2.Request('http://localhost:4470/pnelsimpleq/api/processQuery')
+    req = urllib2.Request('http://localhost:4444/processQuery')
     req.add_header('Content-Type', 'application/json')
     try:
         print(question)
@@ -52,6 +52,6 @@ for result in _results:
     results.append(result)
 
  
-f1 = open('pnelsimpleqsimpleq.json','w')
+f1 = open('simpleqtestout.json','w')
 print(json.dumps(results),file=f1)
 f1.close()

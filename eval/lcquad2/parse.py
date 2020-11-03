@@ -8,7 +8,7 @@ from multiprocessing import Pool
 def hiturl(questionserial):
     question = questionserial[0]
     serial = questionserial[1]['uid']
-    req = urllib2.Request('http://localhost:4451/processQuery')
+    req = urllib2.Request('http://localhost:4444/processQuery')
     req.add_header('Content-Type', 'application/json')
     try:
         print(question)
@@ -21,7 +21,7 @@ def hiturl(questionserial):
     except Exception,e:
         return(int(serial),'[]',questionserial[1])
 
-f = open('../../../../../LC-QuAD2.0/dataset/test.json')
+f = open('./LC-QuAD2.0/dataset/test.json')
 s = f.read()
 d = json.loads(s)
 f.close()
@@ -52,6 +52,6 @@ for result in _results:
     results.append(result)
 
  
-f1 = open('erroranal_searchcands1.json','w')
+f1 = open('lcqout.json','w')
 print(json.dumps(results),file=f1)
 f1.close()

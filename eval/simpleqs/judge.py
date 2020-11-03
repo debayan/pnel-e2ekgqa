@@ -9,7 +9,7 @@ for line in f.readlines():
     gold.append(s)
 
 
-f = open('pnellcqsimpleq.json')
+f = open('simpleqtestout.json')
 d1 = json.loads(f.read())
 
 d = sorted(d1, key=lambda x: int(x[0]))

@@ -2,7 +2,7 @@ import sys,os,json,re
 
 
 gold = []
-f = open('/home/sda-srv05/debayan/LC-QuAD2.0/dataset/test.json')
+f = open('./LC-QuAD2.0/dataset/test.json')
 d1 = json.loads(f.read())
 
 d = sorted(d1, key=lambda x: int(x['uid']))
@@ -18,7 +18,7 @@ for item in d:
     unit['relations'] = [rel for rel in _rels]
     gold.append(unit)
 
-f = open(sys.argv[1])
+f = open('lcqout.json')
 d1 = json.loads(f.read())
 
 d = sorted(d1, key=lambda x: int(x[0]))

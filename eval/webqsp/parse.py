@@ -9,7 +9,7 @@ import time
 def hiturl(questionserial):
     question = questionserial[0]
     serial = questionserial[1]['question_id']
-    req = urllib2.Request('http://localhost:4451/processQuery')
+    req = urllib2.Request('http://localhost:4444/processQuery')
     req.add_header('Content-Type', 'application/json')
     try:
         print(question)
@@ -54,6 +54,6 @@ for result in _results:
     results.append(result)
 
  
-f1 = open('erroranalysissearchranks1.json','w')
+f1 = open('webqtestout.json','w')
 print(json.dumps(results),file=f1)
 f1.close()

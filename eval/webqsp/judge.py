@@ -15,7 +15,7 @@ for item in d:
     unit['all'] = item
     gold.append(unit)
 
-f = open(sys.argv[1])
+f = open('webqtestout.json')
 d1 = json.loads(f.read())
 
 d = sorted(d1, key=lambda x: x[0])
