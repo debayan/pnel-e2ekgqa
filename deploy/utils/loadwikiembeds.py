@@ -11,7 +11,7 @@ with open("../data/wikidata_translation_v1.tsv") as infile:
         key = items[0]
         vector = items[1:]
         if '/Q' in key or '/P' in key or '@en' in key:
-            action = { "_index": "wikidataembedsindex01", "_type": "records", "_source": { "key": key, "embedding": vector } }
+            action = { "_index": "wikidataembedsindex01", "_source": { "key": key, "embedding": vector } }
             actions.append(action)
         if len(actions) == 100000:
             print("indexing 100k docs ....")
