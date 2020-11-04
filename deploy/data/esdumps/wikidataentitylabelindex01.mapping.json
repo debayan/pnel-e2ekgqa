@@ -1,1 +1,0 @@
-{"wikidataentitylabelindex01":{"mappings":{"properties":{"uri":{"type":"keyword"},"wikidataLabel":{"type":"text","index_options":"docs","analyzer":"english"}}}}}
