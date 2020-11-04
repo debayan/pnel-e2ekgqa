@@ -36,7 +36,7 @@ Then import mappings into ES instance:
 
 (pnel)$ elasticdump --input=wikidataentitydescriptionsindex01.mapping.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=mapping
 
-(pnel)$ elasticdump --input=wikidataentitylabelindex01.mapping.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=mapping
+(pnel)$ elasticdump --input=wikidataentitylabelindex01.mapping.json --output=http://localhost:9200/wikidataentitylabelindex01 --type=mapping
 ```
 Now load data. Download the following 2 dumps of indices:
 
