@@ -28,27 +28,19 @@ The first step towards using our model is to populate an Elasticsearch instance 
 First Install an Elasticsearch 7.x instance. 
 Then install elasticdump version 6.33.4 ( ```npm install elasticdump@6.33.4``` ). 
 
-Then import mappings into ES instance:
-```
-(pnel)$ cd pnel/deploy/data/esdumps
+Then create indices and mappings as specified in ```pnel/deploy/data/esdumps/mappings.json```.
 
-(pnel)$ elasticdump --input=wikidataembedsindex01.mapping.json  --output=http://localhost:9200/wikidataembedsindex01 --type=mapping
-
-(pnel)$ elasticdump --input=wikidataentitydescriptionsindex01.mapping.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=mapping
-
-(pnel)$ elasticdump --input=wikidataentitylabelindex01.mapping.json --output=http://localhost:9200/wikidataentitylabelindex01 --type=mapping
-```
 Now load data. Download the following 2 dumps of indices:
 
-https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.gz
-https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.gz
+https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.tgz
+https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.tgz
 
-Unzip them using gunzip program, and import them into the ES instance. Adjust the ```--limit``` field based on available memory in your ES instance.
+Unzip them using `tar -zxvf` program, and import them into the ES instance. Adjust the ```--limit``` field based on available memory in your ES instance.
 ```
 (pnel)$ elasticdump --limit=10000 --input=wikidataentitydescriptionsindex01.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=data
 (pnel)$ elasticdump --limit=10000 --input=wikidataentitylabelindex01.json --output=http://localhost:9200/wikidataentitylabelindex01 --type=data
 ```
-To import the third index, i.e., the TransE embeddings for Wikidata, download the pre-trained embeddings provided by PyTorch BigGraph https://dl.fbaipublicfiles.com/torchbiggraph/wikidata_translation_v1.tsv.gz.
+To import the third index, i.e., the TransE embeddings for Wikidata, download the pre-trained embeddings provided by PyTorch BigGraph.
 
 ```
 (pnel)$ cd pnel/deploy/data
