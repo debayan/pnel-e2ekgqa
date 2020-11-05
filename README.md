@@ -25,30 +25,24 @@ The first step towards using our model is to populate an Elasticsearch instance 
 2. Entity Descriptions
 3. Entity Labels
 
-First Install an Elasticsearch 7.x instance. 
+First Install an Elasticsearch 7.x instance.
+
 Then install elasticdump version 6.33.4 ( ```npm install elasticdump@6.33.4``` ). 
 
-Then import mappings into ES instance:
-```
-(pnel)$ cd pnel/deploy/data/esdumps
+Then create indices and mappings as specified in ```pnel/deploy/data/esdumps/mappings.json```.
 
-(pnel)$ elasticdump --input=wikidataembedsindex01.mapping.json  --output=http://localhost:9200/wikidataembedsindex01 --type=mapping
-
-(pnel)$ elasticdump --input=wikidataentitydescriptionsindex01.mapping.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=mapping
-
-(pnel)$ elasticdump --input=wikidataentitylabelindex01.mapping.json --output=http://localhost:9200/wikidataentitylabelindex01 --type=mapping
-```
 Now load data. Download the following 2 dumps of indices:
 
-https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.gz
-https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.gz
+https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.tgz
 
-Unzip them using gunzip program, and import them into the ES instance. Adjust the ```--limit``` field based on available memory in your ES instance.
+https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitylabelindex01.tgz
+
+Unzip them using `tar -zxvf` program, and import them into the ES instance. Adjust the ```--limit``` field based on available memory in your ES instance.
 ```
 (pnel)$ elasticdump --limit=10000 --input=wikidataentitydescriptionsindex01.json --output=http://localhost:9200/wikidataentitydescriptionsindex01 --type=data
 (pnel)$ elasticdump --limit=10000 --input=wikidataentitylabelindex01.json --output=http://localhost:9200/wikidataentitylabelindex01 --type=data
 ```
-To import the third index, i.e., the TransE embeddings for Wikidata, download the pre-trained embeddings provided by PyTorch BigGraph https://dl.fbaipublicfiles.com/torchbiggraph/wikidata_translation_v1.tsv.gz.
+To import the third index, i.e., the TransE embeddings for Wikidata, download the pre-trained embeddings provided by PyTorch BigGraph.
 
 ```
 (pnel)$ cd pnel/deploy/data
@@ -102,8 +96,10 @@ It is possible to use the generated model to deploy a REST API for Entity Linkin
 (pnel)$ ln -s ../train/models/ .
 (pnel)$ cd data/ && wget https://ltdata1.informatik.uni-hamburg.de/debayanpnel/fasttext-wiki-news-subwords-300 && cd ../
 (pnel)$ python TextMatchServer.py 8887
-(pnel)$ python api.py ./train/models/webqmodels/ 4444
+(pnel)$ python api.py --port 4444 --modeldir ./train/models/webqmodels/ --layers 1 --rnnsize 512 --attentionsize 128
 ```
+For ```layers```,```rnnsize``` and ```attentionsize```, use the same values used during training the model.
+
 The above command starts an API at port 4444. To access it one may use the following curl command:
 ```
 $ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
@@ -116,15 +112,21 @@ For LC-QuAD 2.0
 ```
 (pnel)$ cd pnel/eval/lcquad2/
 (pnel)$ python parse.py (this hits the API with test set questions)
-(pnel)$ python judge,py (this produces the F1 score)
+(pnel)$ python judge.py (this produces the F1 score)
 ```
 For other datasets, use the other folders in ```pnel/eval/```.
 
 ### Pre-trained models
 
-***Coming Soon***
+For LC-QuAD 2.0, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/lcq1142.tgz, uncompress it using ```tar -zxvf```, then
+```
+(pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 512 --attentionsize 128 --layers 1
+```
 
-
+For WebQSP, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/webq1142.tgz, uncompress it using ```tar -zxvf```, then
+```
+(pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 256 --attentionsize 64 --layers 1
+```
 
 
 ## Citation
