@@ -25,7 +25,8 @@ The first step towards using our model is to populate an Elasticsearch instance 
 2. Entity Descriptions
 3. Entity Labels
 
-First Install an Elasticsearch 7.x instance. 
+First Install an Elasticsearch 7.x instance.
+
 Then install elasticdump version 6.33.4 ( ```npm install elasticdump@6.33.4``` ). 
 
 Then create indices and mappings as specified in ```pnel/deploy/data/esdumps/mappings.json```.
@@ -33,7 +34,8 @@ Then create indices and mappings as specified in ```pnel/deploy/data/esdumps/map
 Now load data. Download the following 2 dumps of indices:
 
 https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.tgz
-https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitydescriptionsindex01.tgz
+
+https://ltdata1.informatik.uni-hamburg.de/debayanpnel/wikidataentitylabelindex01.tgz
 
 Unzip them using `tar -zxvf` program, and import them into the ES instance. Adjust the ```--limit``` field based on available memory in your ES instance.
 ```
