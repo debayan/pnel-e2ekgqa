@@ -94,8 +94,10 @@ It is possible to use the generated model to deploy a REST API for Entity Linkin
 (pnel)$ ln -s ../train/models/ .
 (pnel)$ cd data/ && wget https://ltdata1.informatik.uni-hamburg.de/debayanpnel/fasttext-wiki-news-subwords-300 && cd ../
 (pnel)$ python TextMatchServer.py 8887
-(pnel)$ python api.py ./train/models/webqmodels/ 4444
+(pnel)$ python api.py --port 4444 --modeldir ./train/models/webqmodels/ --layers 1 --rnnsize 512 --attentionsize 128
 ```
+For ```layers```,```rnnsize``` and ```attentionsize```, use the same values used during training the model.
+
 The above command starts an API at port 4444. To access it one may use the following curl command:
 ```
 $ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
@@ -108,15 +110,21 @@ For LC-QuAD 2.0
 ```
 (pnel)$ cd pnel/eval/lcquad2/
 (pnel)$ python parse.py (this hits the API with test set questions)
-(pnel)$ python judge,py (this produces the F1 score)
+(pnel)$ python judge.py (this produces the F1 score)
 ```
 For other datasets, use the other folders in ```pnel/eval/```.
 
 ### Pre-trained models
 
-***Coming Soon***
+For LC-QuAD 2.0, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/lcq1142.tgz, uncompress it using ```tar -zxvf```, then
+```
+(pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 512 --attentionsize 128 --layers 1
+```
 
-
+For WebQSP, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/webq1142.tgz, uncompress it using ```tar -zxvf```, then
+```
+(pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 256 --attentionsize 64 --layers 1
+```
 
 
 ## Citation
