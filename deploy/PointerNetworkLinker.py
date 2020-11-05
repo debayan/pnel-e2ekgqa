@@ -6,26 +6,21 @@ import time,os,sys,json,re,requests
 from Vectoriser import Vectoriser
 import copy
 
-tf.app.flags.DEFINE_integer("max_input_sequence_len", 3000, "Maximum input sequence length.")
-tf.app.flags.DEFINE_integer("max_output_sequence_len", 100, "Maximum output sequence length.")
-tf.app.flags.DEFINE_integer("rnn_size", 512, "RNN unit size.")
-tf.app.flags.DEFINE_integer("attention_size", 128, "Attention size.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers.")
-tf.app.flags.DEFINE_integer("beam_width", 1, "Width of beam search .")
-tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
-tf.app.flags.DEFINE_string("test_data", "./a.txt", "Learning rate.")
-tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Maximum gradient norm.")
-tf.app.flags.DEFINE_boolean("forward_only", True, "Forward Only.")
-#tf.app.flags.DEFINE_string("models_dir", "../data/lcqmodel0/", "Log directory")
-tf.app.flags.DEFINE_integer("batch_size", 1, "batchsize")
-FLAGS = tf.app.flags.FLAGS
 
 class PointerNetworkLinker():
-    def __init__(self, modelpath):
+    def __init__(self, modelpath, rnnsize, attentionsize, layers):
         print("Initialising PointerNetworkLinker")
         self.modelpath = modelpath
+        self.rnn_size = rnnsize
+        self.attention_size = attentionsize
+        self.num_layers = layers
         self.forward_only = True
         self.graph = tf.Graph()
+        self.max_input_sequence_len = 3000
+        self.max_output_sequence_len = 100
+        self.beam_width = 1
+        self.batch_size = 1
+        self.forward_only = True
         with self.graph.as_default():
             config = tf.ConfigProto()
             config.gpu_options.allow_growth = True
@@ -37,15 +32,13 @@ class PointerNetworkLinker():
     
     def build_model(self):
         with self.graph.as_default():
-            self.model = pointer_net.PointerNet(batch_size=FLAGS.batch_size,
-                        max_input_sequence_len=FLAGS.max_input_sequence_len,
-                        max_output_sequence_len=FLAGS.max_output_sequence_len,
-                        rnn_size=FLAGS.rnn_size,
-                        attention_size=FLAGS.attention_size,
-                        num_layers=FLAGS.num_layers,
-                        beam_width=FLAGS.beam_width,
-                        learning_rate=FLAGS.learning_rate,
-                        max_gradient_norm=FLAGS.max_gradient_norm,
+            self.model = pointer_net.PointerNet(batch_size=self.batch_size,
+                        max_input_sequence_len=self.max_input_sequence_len,
+                        max_output_sequence_len=self.max_output_sequence_len,
+                        rnn_size=self.rnn_size,
+                        attention_size=self.attention_size,
+                        num_layers=self.num_layers,
+                        beam_width=self.beam_width,
                         forward_only=self.forward_only)
             ckpt = tf.train.get_checkpoint_state(self.modelpath)
             print(ckpt, self.modelpath)
@@ -106,14 +99,14 @@ class PointerNetworkLinker():
         maxlen = 0
         questioninputs = []
         enc_input_len = len(vectors)
-        if enc_input_len > FLAGS.max_input_sequence_len:
+        if enc_input_len > self.max_input_sequence_len:
             print("Length too long, skip")
             return []
         for idx,word in enumerate(vectors):
             questioninputs.append(word[0])
-        for i in range(FLAGS.max_input_sequence_len-enc_input_len):
+        for i in range(self.max_input_sequence_len-enc_input_len):
             questioninputs.append([0]*1142)
-        weight = np.zeros(FLAGS.max_input_sequence_len)
+        weight = np.zeros(self.max_input_sequence_len)
         weight[:enc_input_len]=1
         enc_input_weights.append(weight)
         inputs.append(questioninputs)
@@ -141,7 +134,10 @@ class PointerNetworkLinker():
 if __name__ == '__main__':
     v = Vectoriser()
     vectors = v.vectorise("what electorate does anna bligh represent?")
-    p = PointerNetworkLinker("../data/lcq1142/")
-    entities = p.link(vectors)
-    
+    #p = PointerNetworkLinker("./models/data/webq1142/", 256, 64, 1)
+    #entities = p.link(vectors)
+    #p = PointerNetworkLinker("./models/data/lcq1142/", 512, 128, 1)
+    #entities = p.link(vectors)
+    #p = PointerNetworkLinker("./models/data/simpleq0/", 512, 128, 1)
+    #entities = p.link(vectors) 
 

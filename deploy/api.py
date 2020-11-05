@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 from flask import request, Response
 from flask import Flask
 from gevent.pywsgi import WSGIServer
@@ -11,9 +12,17 @@ from pynif import NIFCollection
 from rdflib import URIRef
 
 logging.basicConfig(filename='earl.log',level=logging.INFO)
-modelpath = sys.argv[1]
+
+parser = argparse.ArgumentParser(description='Run PNEL API')
+parser.add_argument('--port', dest='port')
+parser.add_argument('--modeldir', dest='modeldir')
+parser.add_argument('--rnnsize', dest='rnnsize')
+parser.add_argument('--attentionsize', dest='attentionsize')
+parser.add_argument('--layers', dest='layers')
+args = parser.parse_args()
+ 
 v = Vectoriser()
-p = PointerNetworkLinker(modelpath)
+p = PointerNetworkLinker(args.modeldir,int(args.rnnsize),int(args.attentionsize),int(args.layers))
 #j = JointLinker()
 
 app = Flask(__name__)
@@ -65,5 +74,5 @@ def processQueryNif():
 
 
 if __name__ == '__main__':
-    http_server = WSGIServer(('', int(sys.argv[2])), app)
+    http_server = WSGIServer(('', int(args.port)), app)
     http_server.serve_forever()
