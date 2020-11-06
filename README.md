@@ -102,7 +102,8 @@ For ```layers```,```rnnsize``` and ```attentionsize```, use the same values used
 
 The above command starts an API at port 4444. To access it one may use the following curl command:
 ```
-$ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
+$ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json'\
+-d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
 ```
 
 
