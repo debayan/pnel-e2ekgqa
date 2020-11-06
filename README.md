@@ -132,7 +132,8 @@ For WebQSP, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/webq1
 The Language Technology Group at University of Hamburg has graciously facilitated the hosting of a live API. This endpoint presents a model trained on LC-QuAD 2.0.
 
 ```
-$ curl -XPOST 'ltdemos.informatik.uni-hamburg.de/pnel/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"is hamburg in germany or is it in austria ?\"}"
+$ curl -XPOST 'ltdemos.informatik.uni-hamburg.de/pnel/processQuery' -H 'Content-Type: application/json' \
+-d"{\"nlquery\":\"is joe biden the president or is donald trump ?\"}"
 ```
 
 
