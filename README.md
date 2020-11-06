@@ -127,6 +127,11 @@ For WebQSP, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/webq1
 ```
 (pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 256 --attentionsize 64 --layers 1
 ```
+###Live API
+
+```
+(pnel)$ curl -XPOST 'ltdemos.informatik.uni-hamburg.de/pnel/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"is hamburg in germany or is it in austria ?\"}"
+```
 
 
 ## Citation
