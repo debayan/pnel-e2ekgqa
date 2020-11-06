@@ -170,7 +170,6 @@ for idx,item in enumerate(d):
     inputcandidates.append((item['id'],item['question'],item['entities']))
     candidatevectors = givewordvectors((item['id'],item['question'],item['entities']))
     print(len(candidatevectors))
-    sys.exit(1)
 #pool = Pool(10)
 #responses = pool.imap(givewordvectors,inputcandidates)
 #count = 0
