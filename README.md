@@ -102,7 +102,8 @@ For ```layers```,```rnnsize``` and ```attentionsize```, use the same values used
 
 The above command starts an API at port 4444. To access it one may use the following curl command:
 ```
-$ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json' -d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
+$ curl -XPOST 'localhost:4444/processQuery' -H 'Content-Type: application/json'\
+-d"{\"nlquery\":\"Where was Narendra Modi born ?\"}"
 ```
 
 
@@ -126,6 +127,14 @@ For LC-QuAD 2.0, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/
 For WebQSP, download https://ltdata1.informatik.uni-hamburg.de/debayanpnel/webq1142.tgz, uncompress it using ```tar -zxvf```, then
 ```
 (pnel)$ python api.py --port 4444 --modeldir ./lcq1142/ --rnnsize 256 --attentionsize 64 --layers 1
+```
+### Live API
+
+The Language Technology Group at University of Hamburg has graciously facilitated the hosting of a live API. This endpoint presents a model trained on LC-QuAD 2.0.
+
+```
+$ curl -XPOST 'ltdemos.informatik.uni-hamburg.de/pnel/processQuery' -H 'Content-Type: application/json' \
+-d"{\"nlquery\":\"is joe biden the president or is donald trump ?\"}"
 ```
 
 
