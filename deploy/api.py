@@ -32,6 +32,9 @@ def processQuery():
     d = request.get_json(silent=True)
     print(d)
     nlquery = d['nlquery']
+    print(len(nlquery.split()), nlquery)
+    if len(nlquery.split()) > 20:
+        return json.dumps({'nlquery':d['nlquery'],'entities':[], 'error': 'Sentence can not contain more than 20 words'}, indent=4, sort_keys=True)
     pagerankflag = False
     try:
         if 'pagerankflag' in d:
