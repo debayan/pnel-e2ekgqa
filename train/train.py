@@ -8,7 +8,7 @@ import sys
 import json
 import glob
 
-tf.app.flags.DEFINE_integer("batch_size", 3,"Batch size.")
+tf.app.flags.DEFINE_integer("batch_size", 32,"Batch size.")
 tf.app.flags.DEFINE_integer("max_input_sequence_len", 3000, "Maximum input sequence length.")
 tf.app.flags.DEFINE_integer("max_output_sequence_len", 100, "Maximum output sequence length.")
 tf.app.flags.DEFINE_integer("rnn_size", 512, "RNN unit size.")
@@ -51,7 +51,7 @@ class EntityLinker(object):
         testlinecount += 1
     print(testlinecount, " lines in test file")
     random.seed(1)
-    self.randomtestlinenumbers = random.sample(range(1,testlinecount-1),100)
+    self.randomtestlinenumbers = random.sample(range(1,testlinecount-1),500)
     print("Will test the following line numbers: ",self.randomtestlinenumbers)
 
 
@@ -84,7 +84,7 @@ class EntityLinker(object):
         if enc_input_len > FLAGS.max_input_sequence_len:
           continue
         for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-          questioninputs.append([0]*1142)
+          questioninputs.append([0]*500)
         weight = np.zeros(FLAGS.max_input_sequence_len)
         weight[:enc_input_len]=1
         enc_input_weights.append(weight)
@@ -231,7 +231,7 @@ class EntityLinker(object):
       for idx,word in enumerate(question[2]):
         questioninputs.append(word[0])
       for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-        questioninputs.append([0]*1142)
+        questioninputs.append([0]*500)
     self.testoutputs.append(question[1])
     weight = np.zeros(FLAGS.max_input_sequence_len)
     weight[:enc_input_len]=1
