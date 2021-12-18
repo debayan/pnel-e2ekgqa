@@ -23,7 +23,7 @@ tf.app.flags.DEFINE_integer("beam_width", 1, "Width of beam search .")
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Maximum gradient norm.")
 tf.app.flags.DEFINE_boolean("forward_only", True, "Forward Only.")
-tf.app.flags.DEFINE_string("models_dir", "../models/model2/solid/", "Log directory")
+tf.app.flags.DEFINE_string("models_dir", "./models/model1/solid/", "Log directory")
 tf.app.flags.DEFINE_string("data_path", "", "Training Data path.")
 tf.app.flags.DEFINE_string("test_data_path", "", "Test Data path.")
 tf.app.flags.DEFINE_string("pred_out_path", "", "Test Data path.")
@@ -78,7 +78,7 @@ class EntityLinker(object):
             for idx,word in enumerate(question):
                 questioninputs.append(word[0])
         for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-            questioninputs.append([0]*500)
+            questioninputs.append([0]*968)
         weight = np.zeros(FLAGS.max_input_sequence_len)
         weight[:enc_input_len]=1
         enc_input_weights.append(weight)
@@ -104,7 +104,7 @@ def erlinker():
             continue
         if not sepseen:
             linkedvecs.append([canv,cans])
-    linkedvecs.append([500*[-1.0],'[SEP]']) # This for now only holds thhe question token + [SEP]. The linked ents and rels will be appended shortly.
+    linkedvecs.append([968*[-1.0],'[SEP]']) # This for now only holds thhe question token + [SEP]. The linked ents and rels will be appended shortly.
 
     batch = [inputvecs]
     vector = linker.getvector(batch)
