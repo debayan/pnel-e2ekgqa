@@ -8,13 +8,13 @@ import sys
 import json
 import glob
 
-tf.app.flags.DEFINE_integer("batch_size", 30,"Batch size.")
-tf.app.flags.DEFINE_integer("max_input_sequence_len", 3000, "Maximum input sequence length.")
-tf.app.flags.DEFINE_integer("max_output_sequence_len", 100, "Maximum output sequence length.")
-tf.app.flags.DEFINE_integer("rnn_size", 512, "RNN unit size.")
-tf.app.flags.DEFINE_integer("attention_size", 128, "Attention size.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers.")
-tf.app.flags.DEFINE_integer("beam_width", 1, "Width of beam search .")
+tf.app.flags.DEFINE_integer("batch_size", 32,"Batch size.")
+tf.app.flags.DEFINE_integer("max_input_sequence_len", 1000, "Maximum input sequence length.")
+tf.app.flags.DEFINE_integer("max_output_sequence_len", 50, "Maximum output sequence length.")
+tf.app.flags.DEFINE_integer("rnn_size", 1024, "RNN unit size.")
+tf.app.flags.DEFINE_integer("attention_size", 64, "Attention size.")
+tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers.")
+tf.app.flags.DEFINE_integer("beam_width", 10, "Width of beam search .")
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Maximum gradient norm.")
 tf.app.flags.DEFINE_boolean("forward_only", False, "Forward Only.")
@@ -76,6 +76,8 @@ class EntityLinker(object):
             continue
         questioninputs = []
         questionoutputs = []
+        #print(question)
+        #qemb = question[2][0][0][1:769]
         for idx,word in enumerate(question[2]):
           questioninputs.append(word[0])
           if word[2] == 1.0:
@@ -84,7 +86,7 @@ class EntityLinker(object):
         if enc_input_len > FLAGS.max_input_sequence_len:
           continue
         for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-          questioninputs.append([0]*968)
+          questioninputs.append([0]*969)
         weight = np.zeros(FLAGS.max_input_sequence_len)
         weight[:enc_input_len]=1
         enc_input_weights.append(weight)
@@ -228,10 +230,11 @@ class EntityLinker(object):
       if enc_input_len > FLAGS.max_input_sequence_len:
         print("Length too long, skip")
         continue
+      #qemb = question[2][0][0][1:769]
       for idx,word in enumerate(question[2]):
         questioninputs.append(word[0])
       for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-        questioninputs.append([0]*968)
+        questioninputs.append([0]*969)
     self.testoutputs.append(question[1])
     weight = np.zeros(FLAGS.max_input_sequence_len)
     weight[:enc_input_len]=1

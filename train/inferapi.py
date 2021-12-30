@@ -14,16 +14,16 @@ import glob
 from copy import deepcopy
 
 tf.app.flags.DEFINE_integer("batch_size", 1,"Batch size.")
-tf.app.flags.DEFINE_integer("max_input_sequence_len", 3000, "Maximum input sequence length.")
-tf.app.flags.DEFINE_integer("max_output_sequence_len", 100, "Maximum output sequence length.")
-tf.app.flags.DEFINE_integer("rnn_size", 512, "RNN unit size.")
-tf.app.flags.DEFINE_integer("attention_size", 128, "Attention size.")
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers.")
-tf.app.flags.DEFINE_integer("beam_width", 1, "Width of beam search .")
+tf.app.flags.DEFINE_integer("max_input_sequence_len", 1000, "Maximum input sequence length.")
+tf.app.flags.DEFINE_integer("max_output_sequence_len", 50, "Maximum output sequence length.")
+tf.app.flags.DEFINE_integer("rnn_size", 1024, "RNN unit size.")
+tf.app.flags.DEFINE_integer("attention_size", 64, "Attention size.")
+tf.app.flags.DEFINE_integer("num_layers", 2, "Number of layers.")
+tf.app.flags.DEFINE_integer("beam_width", 10, "Width of beam search .")
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 5.0, "Maximum gradient norm.")
 tf.app.flags.DEFINE_boolean("forward_only", True, "Forward Only.")
-tf.app.flags.DEFINE_string("models_dir", "./models/model1/solid/", "Log directory")
+tf.app.flags.DEFINE_string("models_dir", "./models/model1/solid", "Log directory")
 tf.app.flags.DEFINE_string("data_path", "", "Training Data path.")
 tf.app.flags.DEFINE_string("test_data_path", "", "Test Data path.")
 tf.app.flags.DEFINE_string("pred_out_path", "", "Test Data path.")
@@ -66,23 +66,21 @@ class EntityLinker(object):
     def getvector(self,d):
         inputs = []
         enc_input_weights = []
-        dec_input_weights = []
-        maxlen = 0
-        self.testoutputs = []
         for question in d:
             questioninputs = []
             enc_input_len = len(question)
             if enc_input_len > FLAGS.max_input_sequence_len:
                 print("Length too long, skip")
                 continue
+            #qemb = question[0][0][1:769]
             for idx,word in enumerate(question):
                 questioninputs.append(word[0])
-        for i in range(FLAGS.max_input_sequence_len-enc_input_len):
-            questioninputs.append([0]*968)
-        weight = np.zeros(FLAGS.max_input_sequence_len)
-        weight[:enc_input_len]=1
-        enc_input_weights.append(weight)
-        inputs.append(questioninputs)
+            for i in range(FLAGS.max_input_sequence_len-enc_input_len):
+                questioninputs.append([0]*969)
+            inputs.append(questioninputs)
+            weight = np.zeros(FLAGS.max_input_sequence_len)
+            weight[:enc_input_len]=1
+            enc_input_weights.append(weight)
         self.test_inputs = np.stack(inputs)
         self.test_enc_input_weights = np.stack(enc_input_weights)
 
@@ -96,31 +94,39 @@ def erlinker():
     citem = copy.deepcopy(d)
     inputvecs = []
     linkedvecs = []
-    sepseen = False
+    sepseencount = 0
     for cans,canv in zip(d['candidatestring'],d['candidatevectors']):
         inputvecs.append([canv,cans])
         if cans == '[SEP]':
-            sepseen = True
-            continue
-        if not sepseen:
+            sepseencount += 1
+        if sepseencount < 2:
             linkedvecs.append([canv,cans])
-    linkedvecs.append([968*[-1.0],'[SEP]']) # This for now only holds thhe question token + [SEP]. The linked ents and rels will be appended shortly.
+    linkedvecs.append([969*[-1.0],'[SEP]']) # This for now only holds thhe question token + [SEP]. The linked ents and rels will be appended shortly.
 
     batch = [inputvecs]
     vector = linker.getvector(batch)
-    predicted,_ = linker.testmodel.step(linker.testsess, linker.test_inputs, linker.test_enc_input_weights, update=False)
-    predentrels = set()
-    for entrelnum in list(predicted[0][0]):
-        if entrelnum <= 0:
-            continue
-        predentrels.add(inputvecs[entrelnum-1][1]) 
-        linkedvecs.append([inputvecs[entrelnum-1][0],inputvecs[entrelnum-1][1]])
-    print(predentrels)
-    citem['predentrels'] = list(predentrels)
-    del citem['candidatevectors']
-    citem['linkedentrelvecs'] = linkedvecs
-    citem['linkedentrelstring'] = [x[1] for x in linkedvecs]
-    return json.dumps(citem, indent=4, sort_keys=True)
+    try:
+        print(linker.test_inputs.shape) 
+        predicted,_ = linker.testmodel.step(linker.testsess, linker.test_inputs, linker.test_enc_input_weights, update=False)
+        predentrels = set()
+        for entrelnum in list(predicted[0][0]):
+            if entrelnum <= 0:
+                continue
+            predentrels.add(inputvecs[entrelnum-1][1]) 
+            linkedvecs.append([inputvecs[entrelnum-1][0],inputvecs[entrelnum-1][1]])
+        print(predentrels)
+        citem['predentrels'] = list(predentrels)
+        del citem['candidatevectors']
+        citem['linkedentrelvecs'] = linkedvecs
+        citem['linkedentrelstring'] = [x[1] for x in linkedvecs]
+        return json.dumps(citem, indent=4, sort_keys=True)
+    except Exception as err:
+        print("ERROR:",err)
+        citem['predentrels'] = []
+        del citem['candidatevectors']
+        citem['linkedentrelvecs'] = linkedvecs
+        citem['linkedentrelstring'] = [x[1] for x in linkedvecs]
+        return json.dumps(citem, indent=4, sort_keys=True) 
 
 if __name__ == '__main__':
     http_server = WSGIServer(('', 2223), app)
